@@ -1,61 +1,38 @@
-# order-api
+# order-system
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+`order-system` es un ecosistema robusto y de alto rendimiento diseñado para la gestión integral del ciclo de vida de órdenes de compra. El núcleo del sistema está impulsado por el microservicio **`order-api`**, desarrollado en **Java con Quarkus**, implementando una arquitectura orientada a eventos (EDA) y patrones de optimización de datos para garantizar una ejecución asíncrona, desacoplada y de baja latencia.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+---
 
-## Running the application in dev mode
+## 🚀 Propósito del Proyecto
 
-You can run your application in dev mode that enables live coding using:
+El objetivo principal de `order-system` es procesar transacciones y órdenes de manera eficiente y escalable. Para evitar cuellos de botella tradicionales en la base de datos relacional y mejorar drásticamente el tiempo de respuesta, **`order-api`** delega las tareas pesadas (como la generación y el envío de facturas por correo electrónico) a un flujo de trabajo asíncrono automatizado, mientras optimiza las lecturas concurrentes utilizando mecanismos de acceso rápido en memoria.
 
-```shell script
-./mvnw quarkus:dev
-```
+---
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+## 🛠️ Arquitectura y Tecnologías Clave
 
-## Packaging and running the application
+El ecosistema está completamente contenedorizado mediante **Docker** e integra los siguientes componentes:
 
-The application can be packaged using:
+* **order-api (Quarkus Framework):** El microservicio central de la aplicación, seleccionado por su tiempo de arranque supersónico, perfil reactivo y bajo consumo de memoria.
+* **PostgreSQL:** Base de datos relacional transaccional utilizada como el almacenamiento persistente definitivo. Se encarga de garantizar la consistencia, integridad y persistencia de las órdenes, usuarios y transacciones comerciales.
+* **Redis:** Utilizado como una **capa de cacheo ultra-rápida en memoria**. Permite almacenar y consultar las órdenes frecuentes en milisegundos, reduciendo drásticamente la carga de lecturas repetitivas sobre **PostgreSQL**.
+* **Apache Kafka (KRaft mode):** Motor de mensajería distribuida encargado del desacoplamiento. Al crearse y persistirse una orden, `order-api` publica un *Thin Event* (evento delgado) conteniendo únicamente el ID de la orden (`{"orderId": 17}`).
+* **n8n:** Motor de automatización de flujos de trabajo (*Workflow Automation*). Escucha los eventos de Kafka en segundo plano, realiza una consulta HTTP de retorno (*callback*) a `order-api` para obtener el DTO detallado de la orden y monta la factura de manera dinámica.
+* **SMTP (Gmail App Password):** Integración en el nodo de salida de n8n para el envío real y seguro de correos electrónicos informativos a los usuarios, utilizando credenciales seguras de aplicación de Google.
 
-```shell script
-./mvnw package
-```
+### Herramientas de Monitoreo e Infraestructura Visual
+Para facilitar el desarrollo, depuración y la observabilidad del entorno local, el archivo `docker-compose.yml` expone:
+* **Kafdrop (Puerto 9000):** Interfaz web para la gestión e inspección visual de los *topics*, mensajes, particiones y el estado general del clúster de Kafka.
+* **Redis Insight (Puerto 5540):** Entorno gráfico avanzado para visualizar las estructuras llave-valor del caché, analizar el rendimiento de las consultas y depurar los datos en memoria de Redis.
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+---
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+## 📐 Flujo de Datos Asíncrono
 
-If you want to build an _über-jar_, execute the following command:
+El flujo de procesamiento sigue un ciclo de vida completamente reactivo y desacoplado:
 
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/order-api-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- JDBC Driver - H2 ([guide](https://quarkus.io/guides/datasource)): Connect to the H2 database via JDBC
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplified JPA/Hibernate data access layer with active record and repository patterns
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
+1. El cliente genera una transacción a través del microservicio **`order-api`**.
+2. La API registra la orden de forma persistente en **PostgreSQL**, actualiza la capa de caché en **Redis** para acelerar futuras lecturas y publica el evento estructurado en **Kafka** (`{"orderId": ID}`).
+3. El trigger de **n8n** captura el evento desde Kafka, procesa el payload de la mensajería y ejecuta una petición `GET` hacia el endpoint `/api/v1/orders/{id}` de `order-api` para extraer los datos frescos y unificados de la orden.
+4. **n8n** inyecta los datos en una plantilla estructurada en HTML y dispara el envío del correo electrónico
