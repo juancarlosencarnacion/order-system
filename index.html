@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factura Electrónica</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f0;
+      padding: 2rem 1rem;
+      color: #1a1a18;
+    }
+
+    .inv-wrap { max-width: 680px; margin: 0 auto; }
+
+    .inv-card {
+      background: #ffffff;
+      border: 0.5px solid rgba(0,0,0,0.12);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .inv-header {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 0.5px solid rgba(0,0,0,0.10);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .inv-brand { display: flex; align-items: center; gap: 12px; }
+
+    .inv-logo {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      background: #e6f1fb;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .inv-logo i { font-size: 20px; color: #185fa5; }
+
+    .inv-title { font-size: 18px; font-weight: 500; color: #1a1a18; margin: 0; }
+    .inv-subtitle { font-size: 13px; color: #5f5e5a; margin: 2px 0 0; }
+
+    .inv-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eaf3de;
+      color: #3b6d11;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 0.5px solid #639922;
+    }
+
+    .inv-meta {
+      padding: 1.5rem 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      border-bottom: 0.5px solid rgba(0,0,0,0.10);
+    }
+
+    .inv-meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888780;
+      margin: 0 0 4px;
+    }
+
+    .inv-meta-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a18;
+      margin: 0;
+      word-break: break-all;
+    }
+
+    .inv-table-wrap {
+      padding: 1.5rem 2rem;
+      border-bottom: 0.5px solid rgba(0,0,0,0.10);
+      overflow-x: auto;
+    }
+
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 14px;
+    }
+
+    .inv-table thead tr { border-bottom: 0.5px solid rgba(0,0,0,0.18); }
+
+    .inv-table th {
+      padding: 8px 12px;
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+      color: #5f5e5a;
+    }
+
+    .inv-table th:nth-child(2),
+    .inv-table th:nth-child(3),
+    .inv-table th:nth-child(4) { text-align: right; }
+
+    .inv-table td {
+      padding: 14px 12px;
+      color: #1a1a18;
+      vertical-align: middle;
+    }
+
+    .inv-table td:nth-child(2),
+    .inv-table td:nth-child(3),
+    .inv-table td:nth-child(4) { text-align: right; }
+
+    .inv-table tbody tr { border-bottom: 0.5px solid rgba(0,0,0,0.08); }
+    .inv-table tbody tr:last-child { border-bottom: none; }
+
+    .prod-name { font-weight: 500; }
+    .prod-desc { font-size: 12px; color: #888780; margin: 2px 0 0; }
+
+    .qty-pill {
+      display: inline-block;
+      background: #f1efe8;
+      border: 0.5px solid rgba(0,0,0,0.10);
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 13px;
+    }
+
+    .amount-total { font-weight: 500; color: #3b6d11; }
+
+    .col-prod  { width: 42%; }
+    .col-qty   { width: 14%; }
+    .col-price { width: 22%; }
+    .col-total { width: 22%; }
+
+    .inv-summary {
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: flex-end;
+      border-bottom: 0.5px solid rgba(0,0,0,0.10);
+    }
+
+    .inv-totals { width: 100%; max-width: 280px; }
+
+    .inv-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      font-size: 13px;
+      color: #5f5e5a;
+    }
+
+    .inv-total-row.final {
+      padding-top: 10px;
+      border-top: 0.5px solid rgba(0,0,0,0.18);
+      margin-top: 6px;
+    }
+
+    .inv-total-row.final .label { font-size: 14px; font-weight: 500; color: #1a1a18; }
+    .inv-total-row.final .value { font-size: 20px; font-weight: 500; color: #3b6d11; }
+
+    .inv-footer {
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .inv-footer-note {
+      font-size: 12px;
+      color: #888780;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 1rem 0.5rem; }
+      .inv-header, .inv-meta, .inv-table-wrap,
+      .inv-summary, .inv-footer { padding-left: 1rem; padding-right: 1rem; }
+      .inv-total-row.final .value { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="inv-wrap">
+    <div class="inv-card">
+
+      <div class="inv-header">
+        <div class="inv-brand">
+          <div class="inv-logo">
+            <i class="ti ti-receipt"></i>
+          </div>
+          <div>
+            <p class="inv-title">Factura electrónica</p>
+            <p class="inv-subtitle">Orden #{{ $json.id }}</p>
+          </div>
+        </div>
+        <div class="inv-badge">
+          <i class="ti ti-circle-check" style="font-size:14px;"></i>
+          Pago confirmado
+        </div>
+      </div>
+
+      <div class="inv-meta">
+        <div>
+          <p class="inv-meta-label">Cliente</p>
+          <p class="inv-meta-value">{{ $json.customerEmail }}</p>
+        </div>
+        <div>
+          <p class="inv-meta-label">Fecha de emisión</p>
+          <p class="inv-meta-value">{{ $json.createdAt }}</p>
+        </div>
+        <div>
+          <p class="inv-meta-label">N.° de orden</p>
+          <p class="inv-meta-value">{{ $json.id }}</p>
+        </div>
+      </div>
+
+      <div class="inv-table-wrap">
+        <table class="inv-table">
+          <colgroup>
+            <col class="col-prod">
+            <col class="col-qty">
+            <col class="col-price">
+            <col class="col-total">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cant.</th>
+              <th>Precio unit.</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <p class="prod-name">{{ $json.productName }}</p>
+                <p class="prod-desc">Artículo de venta</p>
+              </td>
+              <td><span class="qty-pill">{{ $json.quantity }}</span></td>
+              <td>${{ $json.productPrice }}</td>
+              <td class="amount-total">${{ $json.totalAmount }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="inv-summary">
+        <div class="inv-totals">
+          <div class="inv-total-row">
+            <span class="label">Subtotal</span>
+            <span class="value">${{ $json.totalAmount }}</span>
+          </div>
+          <div class="inv-total-row">
+            <span class="label">ITBIS (18%)</span>
+            <span class="value">—</span>
+          </div>
+          <div class="inv-total-row final">
+            <span class="label">Total a pagar</span>
+            <span class="value">${{ $json.totalAmount }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="inv-footer">
+        <p class="inv-footer-note">
+          <i class="ti ti-shield-check" style="font-size:14px;"></i>
+          Comprobante generado automáticamente
+        </p>
+        <p class="inv-footer-note">
+          <i class="ti ti-lock" style="font-size:14px;"></i>
+          Transacción segura
+        </p>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
