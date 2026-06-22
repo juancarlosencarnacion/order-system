@@ -2,23 +2,34 @@ package order.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import order.entity.OrderStatus;
+import product.entity.ProductCategory;
 
 public record OrderResponse(
-    Long id,
-    Integer quantity,
-    BigDecimal totalAmount,
-    OrderStatus status,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt,
+        // ORDER
+        Long id,
+        BigDecimal totalAmount,
+        OrderStatus status,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
 
-    Long customerId,
-    String customerEmail,
+        // CUSTOMER
+        Long customerId,
+        String customerEmail,
 
-    Long productId,
-    String productName,
-    BigDecimal productPrice
+        // ORDER DETAILS
+        List<OrderDetails> details
+
 ) {
+    public record OrderDetails(
+            Long orderDetailId,
+            Long productId,
+            String productName,
+            ProductCategory category,
+            Integer quantity,
+            BigDecimal priceAtPurchase) {
+    }
 
 }

@@ -2,11 +2,16 @@ package order.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import customers.entity.Customer;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +22,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,11 +48,12 @@ public class Order {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @Builder.Default
+    @JsonManagedReference
+    private List<OrderDetails> details = new ArrayList<>();
 
-    private Integer quantity;
+    // private Integer quantity;
  
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
@@ -61,4 +68,14 @@ public class Order {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public void addProduct(Product product, Integer quantity) {
+        OrderDetails details = new OrderDetails();
+        details.setProduct(product);
+        details.setQuantity(quantity);
+        details.setPriceAtPurchase(product.getPrice());
+        details.setOrder(this);
+
+        this.details.add(details);
+    }
 }

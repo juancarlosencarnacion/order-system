@@ -1,9 +1,9 @@
 package order.kafka;
 
-import order.event.OrderCreatedEvent;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import order.dto.OrderEvent;
+import order.dto.OrderResponse;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
@@ -13,11 +13,20 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 public class OrderProducer {
 
     @Inject
-    @Channel("ordenes-out")
-    Emitter<OrderCreatedEvent> emitter;
+    @Channel("order-created-out")
+    Emitter<OrderEvent> createdEmitter;
 
-    public void send(OrderCreatedEvent event) {
-        System.out.println("ENVIANDO EVENTO -> " + event);
-        emitter.send(event);
+    @Inject
+    @Channel("order-verified-out")
+    Emitter<OrderEvent> verifiedEmitter;
+
+    public void sendOrderCreated(OrderResponse orderData) {
+        OrderEvent event = new OrderEvent(EventType.CREATED.name(), orderData);
+        createdEmitter.send(event);
+    }
+    
+    public void sendOrderVerified(OrderResponse orderData) {
+        OrderEvent event = new OrderEvent(EventType.STOCK_VERIFIED.name(), orderData);
+        verifiedEmitter.send(event);
     }
 }

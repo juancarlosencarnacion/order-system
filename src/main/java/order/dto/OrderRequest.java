@@ -1,9 +1,12 @@
 package order.dto;
 
-public record OrderRequest(
-    Long customerId,
-    Long productId,
-    Integer quantity
-) {
+import java.util.List;
 
+public record OrderRequest(
+        Long customerId,
+        List<Products> products) {
+    public record Products(
+            Long productId,
+            Integer quantity) {
+    }
 }

@@ -1,13 +1,129 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  </head>
-  <body>
-    <h1 class="text-3xl font-bold underline text-red">
-      Hello world!
-    </h1>
-  </body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0; padding:0; background-color:#f4f4f0; font-family:Arial, Helvetica, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f4f0; padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:12px; border:1px solid #e0e0d8; overflow:hidden;">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="padding:28px 32px 24px; border-bottom:1px solid #e8e8e4;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td>
+                    <p style="margin:0; font-size:18px; font-weight:bold; color:#1a1a18;">Factura Electrónica</p>
+                    <p style="margin:4px 0 0; font-size:13px; color:#888780;">Orden #{{ $json.id }}</p>
+                  </td>
+                  <td align="right" valign="middle">
+                    <span style="display:inline-block; background-color:#eaf3de; color:#3b6d11; font-size:12px; font-weight:bold; padding:5px 12px; border-radius:6px; border:1px solid #97c459;">
+                      ✔ Pago confirmado
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- META -->
+          <tr>
+            <td style="padding:24px 32px; border-bottom:1px solid #e8e8e4;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="33%" valign="top">
+                    <p style="margin:0 0 4px; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:#888780;">Cliente</p>
+                    <p style="margin:0; font-size:13px; font-weight:bold; color:#1a1a18; word-break:break-all;">{{ $json.customerEmail }}</p>
+                  </td>
+                  <td width="33%" valign="top" style="padding-left:16px;">
+                    <p style="margin:0 0 4px; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:#888780;">Fecha de emisión</p>
+                    <p style="margin:0; font-size:13px; font-weight:bold; color:#1a1a18;">{{ $json.createdAt }}</p>
+                  </td>
+                  <td width="33%" valign="top" style="padding-left:16px;">
+                    <p style="margin:0 0 4px; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:#888780;">N.° de orden</p>
+                    <p style="margin:0; font-size:13px; font-weight:bold; color:#1a1a18;">{{ $json.id }}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- TABLE HEADER -->
+          <tr>
+            <td style="padding:0 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #e8e8e4; margin-top:0;">
+                <tr style="background-color:#f8f8f4;">
+                  <td width="44%" style="padding:10px 12px; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:#888780; font-weight:bold;">Producto</td>
+                  <td width="14%" align="center" style="padding:10px 12px; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:#888780; font-weight:bold;">Cant.</td>
+                  <td width="21%" align="right" style="padding:10px 12px; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:#888780; font-weight:bold;">Precio unit.</td>
+                  <td width="21%" align="right" style="padding:10px 12px; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:#888780; font-weight:bold;">Total</td>
+                </tr>
+                <!-- PRODUCT ROW -->
+                <tr style="border-top:1px solid #e8e8e4;">
+                  <td width="44%" style="padding:16px 12px; font-size:14px; color:#1a1a18;">
+                    <span style="font-weight:bold;">{{ $json.productName }}</span><br>
+                    <span style="font-size:12px; color:#888780;">Artículo de venta</span>
+                  </td>
+                  <td width="14%" align="center" style="padding:16px 12px;">
+                    <span style="display:inline-block; background-color:#f1efe8; border:1px solid #d3d1c7; border-radius:6px; padding:3px 10px; font-size:13px; color:#1a1a18;">{{ $json.quantity }}</span>
+                  </td>
+                  <td width="21%" align="right" style="padding:16px 12px; font-size:14px; color:#1a1a18;">${{ $json.productPrice }}</td>
+                  <td width="21%" align="right" style="padding:16px 12px; font-size:14px; font-weight:bold; color:#3b6d11;">${{ $json.totalAmount }}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- TOTALS -->
+          <tr>
+            <td style="padding:20px 32px; border-top:1px solid #e8e8e4;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="60%"></td>
+                  <td width="40%">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="padding:4px 0; font-size:13px; color:#888780;">Subtotal</td>
+                        <td align="right" style="padding:4px 0; font-size:13px; color:#888780;">${{ $json.totalAmount }}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:4px 0; font-size:13px; color:#888780;">ITBIS (18%)</td>
+                        <td align="right" style="padding:4px 0; font-size:13px; color:#888780;"></td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" style="padding-top:10px; border-top:1px solid #d3d1c7;"></td>
+                      </tr>
+                      <tr>
+                        <td style="padding:2px 0; font-size:14px; font-weight:bold; color:#1a1a18;">Total a pagar</td>
+                        <td align="right" style="padding:2px 0; font-size:20px; font-weight:bold; color:#3b6d11;">${{ $json.totalAmount }}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="padding:16px 32px 24px; border-top:1px solid #e8e8e4;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="font-size:12px; color:#aaa89e;">&#128274; Transacción segura</td>
+                  <td align="right" style="font-size:12px; color:#aaa89e;">Comprobante generado automáticamente</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
 </html>
