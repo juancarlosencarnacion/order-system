@@ -44,6 +44,8 @@ nb-configuration.xml
 # TLS Certificates
 .certs/
 
+.env
+
 test.js
 test2.js
 test.json
